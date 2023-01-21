@@ -4,12 +4,15 @@ import sys
 from field import Field
 
 
+pygame.font.init()
+
+
 def main():
     pygame.init()
     bg = pygame.image.load("data/sprites/background.png")
     screen = pygame.display.set_mode((1000, 600))
-    board1 = Field(10, 100)
-    board2 = Field(10, board1.getFieldWidth() + 150)
+    board1 = Field(50, 100, 0, 'Ваше поле')
+    board2 = Field(50, board1.getFieldWidth() + 150, 11.3, 'Поле противника')
     while True:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -18,6 +21,7 @@ def main():
         screen.blit(bg, (0, 0))
         board1.render(screen)
         board2.render(screen)
+
         pygame.display.flip()
 
 
