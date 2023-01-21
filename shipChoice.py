@@ -82,6 +82,6 @@ class ShipChoice:
         x = 100
         for sprite in self.shipView.sprites():
             sprite.rect.x = x
-            sprite.rect.y = self.y
+            sprite.rect.y = 470
             x += sprite.rect.width + INTERVAL
         self.end_coords[0] = x

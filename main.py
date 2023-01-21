@@ -24,16 +24,15 @@ def main():
     ship_choice_bar = ShipChoice(all_sprites)
     while True:
         for event in pygame.event.get():
-            if event.type == pygame.MOUSEBUTTONDOWN:
-                x, y = event.pos
-                if board2.check_click_corr(x, y):
-                    board2.check_strike(x, y, screen)
-            elif event.type == pygame.QUIT:
+            if event.type == pygame.QUIT:
                 pygame.quit()
                 return
             elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
                 sp = event.pos
                 ship_choice_bar.start_motion(sp)
+                x, y = event.pos
+                if board2.check_click_corr(x, y):
+                    board2.check_strike(x, y, screen)
 
             elif event.type == pygame.MOUSEMOTION and ship_choice_bar.get_motion_flag():
                 pos = event.rel
