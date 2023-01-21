@@ -28,6 +28,7 @@ class Field:
         self.offset = offset
         self.title = title
 
+
     def render(self, screen):
 
         #отрисовка названий полей
@@ -45,6 +46,22 @@ class Field:
             for x in range(self.width):
                 pygame.draw.rect(screen, FIELD_COLOR, (
                     x * self.cell_size + self.left, y * self.cell_size + self.top, self.cell_size, self.cell_size), 1)
+                if self.board[y][x] == 2:
+                    pygame.draw.circle(screen, WHITE, (
+                        x * self.cell_size + self.left + self.cell_size // 2,
+                        y * self.cell_size + self.top + self.cell_size // 2),
+                                       4)
+                if self.board[y][x] == 3:
+                    pygame.draw.line(screen, WHITE,
+                                     (x * self.cell_size + self.left + 3, y * self.cell_size + self.top + 3),
+                                     (x * self.cell_size + self.left + self.cell_size - 5,
+                                      y * self.cell_size + self.top + self.cell_size - 4), width=4)
+                    pygame.draw.line(screen, WHITE,
+                                     (x * self.cell_size + self.left + 3,
+                                      y * self.cell_size + self.top + self.cell_size - 4),
+                                     (x * self.cell_size + self.left + self.cell_size - 5,
+                                      y * self.cell_size + self.top + 3), width=4)
+
 
         #отрисовка цифр и букв
         for i in range(10):
@@ -62,7 +79,22 @@ class Field:
             screen.blit(letters_hor, (left_margin + i * CELL_SIZE + (CELL_SIZE // 2 -
                                                                       letters_hor_width // 2) + self.offset * CELL_SIZE, upper_margin + 10 * CELL_SIZE))
 
+    def check_strike(self, x, y, screen):
+        x_cells = (x - self.left) // CELL_SIZE
+        y_cells = (y - self.top) // CELL_SIZE
+        if self.board[y_cells][x_cells] == 0:
+            self.board[y_cells][x_cells] = 2
+        if self.board[y_cells][x_cells] == 1:
+            self.board[y_cells][x_cells] = 3
 
+
+
+
+    def check_click_corr(self, x, y):
+        if self.left <= x <= self.left + CELL_SIZE * WIDTH and self.top <= y <= self.top + CELL_SIZE * HEIGHT:
+            return True
+        else:
+            return False
 
 
     def getFieldWidth(self):
