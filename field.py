@@ -87,16 +87,21 @@ class Field:
         if self.board[y_cells][x_cells] == 1:
             self.board[y_cells][x_cells] = 3
 
-
-
-
     def check_click_corr(self, x, y):
         if self.left <= x <= self.left + CELL_SIZE * WIDTH and self.top <= y <= self.top + CELL_SIZE * HEIGHT:
             return True
         else:
             return False
 
-
-    def getFieldWidth(self):
+    def get_field_width(self):
         return self.cell_size * self.width
+
+    def get_field_height_coord(self):
+        return self.cell_size * self.height + self.top
+
+    def set_ship(self, x, y):
+        x_cells = (x - self.left) // CELL_SIZE
+        y_cells = (y - self.top) // CELL_SIZE
+
+        return self.left + x_cells * CELL_SIZE - 5, self.top + y_cells * CELL_SIZE
 
