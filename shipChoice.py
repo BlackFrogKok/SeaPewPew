@@ -18,10 +18,10 @@ class ShipChoice:
     def __init__(self, all_sprites):
         self.current_ship = None
         self.all_sprites = all_sprites
-        self.listShip = {load_image("FourDeckShip.png"): 1,
-                         load_image("ThreeDeckShip.png"): 2,
-                         load_image("TwoDeckShip.png"): 3,
-                         load_image("OneDeckShip.png"): 4}
+        self.listShip = {load_image("FourDeckShip2.png"): 1,
+                         load_image("ThreeDeckShip2.png"): 2,
+                         load_image("TwoDeckShip2.png"): 3,
+                         load_image("OneDeckShip2.png"): 4}
         self.motionFlag = False
         self.start_coords = [100, 470]
         self.end_coords = [100, 600]
