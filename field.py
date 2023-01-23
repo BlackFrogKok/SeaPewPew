@@ -4,7 +4,7 @@ import pygame
 pygame.font.init()
 WIDTH = 10
 HEIGHT = 10
-CELL_SIZE = 40
+CELL_SIZE = 50
 FIELD_COLOR = pygame.Color('white')
 font_size = int(CELL_SIZE / 1.5)
 font = pygame.font.SysFont('notosans', font_size)
@@ -84,8 +84,9 @@ class Field:
         y_cells = (y - self.top) // CELL_SIZE
         if self.board[y_cells][x_cells] == 0:
             self.board[y_cells][x_cells] = 2
-        if self.board[y_cells][x_cells] == 1:
+        elif self.board[y_cells][x_cells] == 1:
             self.board[y_cells][x_cells] = 3
+
 
     def check_click_corr(self, x, y):
         if self.left <= x <= self.left + CELL_SIZE * WIDTH and self.top <= y <= self.top + CELL_SIZE * HEIGHT:
@@ -103,5 +104,5 @@ class Field:
         x_cells = (x - self.left) // CELL_SIZE
         y_cells = (y - self.top) // CELL_SIZE
 
-        return self.left + x_cells * CELL_SIZE - 5, self.top + y_cells * CELL_SIZE
+        return self.left + x_cells * CELL_SIZE, self.top + y_cells * CELL_SIZE
 

@@ -29,7 +29,8 @@ class ShipChoice:
         self.moved_item = pygame.sprite.Group()
         for img in self.listShip.keys():
             sprite = pygame.sprite.Sprite()
-            sprite.image = pygame.transform.scale(img, (50, img.get_height() // 4))
+            # sprite.image = pygame.transform.scale(img, (50, img.get_height() // 4))
+            sprite.image = img
             sprite.id = img
             sprite.rect = sprite.image.get_rect()
             sprite.rect.x = self.end_coords[0]
