@@ -1,5 +1,6 @@
 import sys
 import pygame
+import main
 
 pygame.init()
 fps = 60
@@ -64,5 +65,5 @@ class Button():
         screen.blit(self.buttonSurface, self.buttonRect)
 
 
-customButton = Button(175, 150, 300, 100, 'Играть!', True)
-customButton = Button(175, 270, 300, 100, 'Об авторах', True)
+customButton = Button(175, 150, 300, 100, 'Играть!', onclickFunction=main.new_game)
+customButton = Button(175, 270, 300, 100, 'Об авторах')

@@ -10,9 +10,10 @@ font_size = int(CELL_SIZE / 1.5)
 font = pygame.font.SysFont('notosans', font_size)
 WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
-left_margin = 2.5 * CELL_SIZE
-upper_margin = 1.3 * CELL_SIZE
+left_margin = 1.9 * CELL_SIZE
+upper_margin = 1.15 * CELL_SIZE
 LETTERS = "ABCDEFGHIJ"
+explosionImg = pygame.image.load('data/sprites/Explosion2.png')
 
 
 
@@ -35,11 +36,11 @@ class Field:
         if self.offset > 0:
             player = font.render('Поле противника', True, WHITE)
             sign_width = player.get_width()
-            screen.blit(player, (self.left + 125, self.top - 20))
+            screen.blit(player, (self.left + 155, self.top - 20))
         else:
             player = font.render('Ваше поле', True, WHITE)
             sign_width = player.get_width()
-            screen.blit(player, (self.left + 150, self.top - 20))
+            screen.blit(player, (self.left + 190, self.top - 20))
 
         #отрисовка клеток
         for y in range(self.height):
@@ -61,6 +62,8 @@ class Field:
                                       y * self.cell_size + self.top + self.cell_size - 4),
                                      (x * self.cell_size + self.left + self.cell_size - 5,
                                       y * self.cell_size + self.top + 3), width=4)
+                    #отрисовка взрыва
+                    screen.blit(explosionImg, (x * self.cell_size + self.left, y * self.cell_size + self.top))
 
 
         #отрисовка цифр и букв

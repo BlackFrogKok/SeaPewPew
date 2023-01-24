@@ -1,5 +1,4 @@
 import pygame
-import sys
 import button
 
 
@@ -14,7 +13,7 @@ sc = pygame.display.set_mode((width, height))
 
 screen = pygame.display.set_mode(res)
 
-dog_surf = pygame.image.load('mor.gif')
+dog_surf = pygame.image.load('../data/sprites/mor.gif')
 dog_rect = dog_surf.get_rect(
     bottomright=(width, height))
 sc.blit(dog_surf, dog_rect)
