@@ -5,12 +5,12 @@ from field import Field
 from shipChoice import ShipChoice
 import button
 
-
 pygame.font.init()
 CELL_SIZE = 50
 WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
 font_size = int(CELL_SIZE / 1.5)
+INTERVAL = 150
 
 
 def start_screen():
@@ -37,7 +37,6 @@ def start_screen():
     pygame.mixer.music.set_volume(0.1)
     pygame.mixer.music.play(-1)
 
-
     while True:
         for ev in pygame.event.get():
             if ev.type == pygame.QUIT:
@@ -59,15 +58,16 @@ def main():
 
 def new_game():
     pygame.mixer.music.stop()
+    pygame.init()
     ships_setup = True
     bg = pygame.image.load("data/sprites/background.png")
     all_sprites = pygame.sprite.Group()
-    screen = pygame.display.set_mode((1500, 750))
+    screen = pygame.display.set_mode((0, 0), pygame.FULLSCREEN)
     score = 0
     font = pygame.font.SysFont('notosans', font_size)
     board1 = Field(50, 100, 0, 'Ваше поле')
-    board2 = Field(50, board1.get_field_width() + 250, 13, 'Поле противника')
-    ship_choice_bar = ShipChoice(all_sprites)
+    board2 = Field(50, board1.get_field_width() + INTERVAL, 11.3, 'Поле противника')
+    ship_choice_bar = ShipChoice(all_sprites, board1.get_field_height())
     while True:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -76,11 +76,11 @@ def new_game():
             elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
                 sp = event.pos
                 if ships_setup:
-                    ship_choice_bar.start_motion(sp)
+                    ship_choice_bar.start_motion(sp, board1.del_ship)
                 else:
                     x, y = event.pos
                     if board2.check_click_corr(x, y):
-                        board2.check_strike(x, y, screen)
+                        board2.check_strike(x, y)
 
             elif event.type == pygame.MOUSEMOTION and ship_choice_bar.get_motion_flag():
                 pos = event.rel
@@ -88,17 +88,16 @@ def new_game():
 
             elif event.type == pygame.MOUSEBUTTONUP and event.button == 1 and ship_choice_bar.get_motion_flag():
                 sp = event.pos
-                ship_choice_bar.stop_motion(sp, board1.check_click_corr, board1.set_ship)
+                ship_choice_bar.stop_motion(sp, board1.check_click_corr,
+                                            board1.set_ship, board1.check_collision_ship)
         screen.blit(bg, (0, 0))
         board1.render(screen)
         board2.render(screen)
         score_render = font.render(f'Очки: {score}', True, WHITE)
-        screen.blit(score_render, (620, 600))
+        screen.blit(score_render, (board1.get_field_width() + INTERVAL // 4, board1.get_field_height()))
         all_sprites.draw(screen)
+        ship_choice_bar.render(screen)
         pygame.display.flip()
-
-
-
 
 
 if __name__ == '__main__':
