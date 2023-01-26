@@ -3,7 +3,7 @@ import sys
 
 from field import Field
 from shipChoice import ShipChoice
-import button
+from button import Button
 
 pygame.font.init()
 CELL_SIZE = 50
@@ -15,14 +15,10 @@ INTERVAL = 150
 
 def start_screen():
     res = width, height = (640, 512)
-
     fps = 60
-    fpsClock = pygame.time.Clock()
-
+    fps_clock = pygame.time.Clock()
     sc = pygame.display.set_mode((width, height))
-
     screen = pygame.display.set_mode(res)
-
     dog_surf = pygame.image.load('data/sprites/mor.gif')
     dog_rect = dog_surf.get_rect(
         bottomright=(width, height))
@@ -36,6 +32,8 @@ def start_screen():
     pygame.mixer.music.load("data/music/noize.mp3")
     pygame.mixer.music.set_volume(0.1)
     pygame.mixer.music.play(-1)
+    buttons = [Button(175, 150, 300, 100, 'Играть!', onclickFunction=new_game),
+               Button(175, 270, 300, 100, 'Об авторах')]
 
     while True:
         for ev in pygame.event.get():
@@ -43,11 +41,11 @@ def start_screen():
                 pygame.mixer.music.stop()
                 pygame.quit()
 
-        for object in button.objects:
-            object.process()
+        for object in buttons:
+            object.process(screen)
 
         pygame.display.flip()
-        fpsClock.tick(fps)
+        fps_clock.tick(fps)
         pygame.display.update()
 
 

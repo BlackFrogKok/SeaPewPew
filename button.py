@@ -1,16 +1,6 @@
-import sys
 import pygame
-import main
-
-pygame.init()
-fps = 60
-fpsClock = pygame.time.Clock()
-width, height = 640, 512
-screen = pygame.display.set_mode((width, height))
 
 font = pygame.font.SysFont('Corbel', 35)
-
-objects = []
 
 
 class Button():
@@ -35,14 +25,12 @@ class Button():
 
         self.alreadyPressed = False
 
-        objects.append(self)
+    def process(self, screen):
 
-    def process(self):
-
-        mousePos = pygame.mouse.get_pos()
+        mouse_pos = pygame.mouse.get_pos()
 
         self.buttonSurface.fill(self.fillColors['normal'])
-        if self.buttonRect.collidepoint(mousePos):
+        if self.buttonRect.collidepoint(mouse_pos):
             self.buttonSurface.fill(self.fillColors['hover'])
 
             if pygame.mouse.get_pressed(num_buttons=3)[0]:
@@ -63,7 +51,3 @@ class Button():
             self.buttonRect.height / 2 - self.buttonSurf.get_rect().height / 2
         ])
         screen.blit(self.buttonSurface, self.buttonRect)
-
-
-customButton = Button(175, 150, 300, 100, 'Играть!', onclickFunction=main.new_game)
-customButton = Button(175, 270, 300, 100, 'Об авторах')

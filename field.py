@@ -1,5 +1,5 @@
+from enum import Enum
 import pygame
-import button
 
 pygame.font.init()
 WIDTH = 10
@@ -11,12 +11,20 @@ font = pygame.font.SysFont('notosans', font_size)
 WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
 LETTERS = "ABCDEFGHIJ"
-explosionImg = pygame.image.load('data/sprites/Explosion.png')
+explosionImg = pygame.image.load('data/sprites/Explosion2.png')
+
+
+class BoardStat(Enum):
+    NOTHING = 0
+    SHIP = 1
+    MISS_SHOT = 2
+    HARM = 3
+    SHIP_AREA = 4
 
 
 class Field:
     def __init__(self, top, left, offset, title):
-        self.board = [[1] * WIDTH for _ in range(HEIGHT)]
+        self.board = [[BoardStat.NOTHING] * WIDTH for _ in range(HEIGHT)]
         self.left = left
         self.top = top
         self.cell_size = CELL_SIZE
@@ -41,12 +49,12 @@ class Field:
             for x in range(WIDTH):
                 pygame.draw.rect(screen, FIELD_COLOR, (
                     x * self.cell_size + self.left, y * self.cell_size + self.top, self.cell_size, self.cell_size), 1)
-                if self.board[y][x] == 2:
+                if self.board[y][x] == BoardStat.MISS_SHOT:
                     pygame.draw.circle(screen, WHITE, (
                         x * self.cell_size + self.left + self.cell_size // 2,
                         y * self.cell_size + self.top + self.cell_size // 2),
                                        4)
-                if self.board[y][x] == 3:
+                if self.board[y][x] == BoardStat.HARM:
                     pygame.draw.line(screen, WHITE,
                                      (x * self.cell_size + self.left + 3, y * self.cell_size + self.top + 3),
                                      (x * self.cell_size + self.left + self.cell_size - 5,
@@ -77,10 +85,11 @@ class Field:
     def check_strike(self, x, y):
         x_cells = (x - self.left) // CELL_SIZE
         y_cells = (y - self.top) // CELL_SIZE
-        if self.board[y_cells][x_cells] == 0:
-            self.board[y_cells][x_cells] = 2
-        elif self.board[y_cells][x_cells] == 1:
-            self.board[y_cells][x_cells] = 3
+        if self.board[y_cells][x_cells] == BoardStat.NOTHING:
+            self.board[y_cells][x_cells] = BoardStat.MISS_SHOT
+            print(self.board[y_cells][x_cells])
+        elif self.board[y_cells][x_cells] == BoardStat.SHIP:
+            self.board[y_cells][x_cells] = BoardStat.HARM
 
     def check_click_corr(self, x, y):
         if self.left <= x <= self.left + CELL_SIZE * WIDTH and self.top <= y <= self.top + CELL_SIZE * HEIGHT:
@@ -99,7 +108,7 @@ class Field:
         y_cells = (y - self.top) // CELL_SIZE
         self.ships.append((x_cells, y_cells, len_ship))
         for i in range(y_cells, y_cells + len_ship):
-            self.board[i][x_cells] = 1
+            self.board[i][x_cells] = BoardStat.SHIP
         self.update_ship_area()
         return self.left + x_cells * CELL_SIZE, self.top + y_cells * CELL_SIZE
 
@@ -110,14 +119,14 @@ class Field:
             for x1 in range(x_cells - 1, x_cells + 2):
                 if x1 < 0 or y1 < 0 or x1 > WIDTH - 1 or y1 > HEIGHT - 1:
                     continue
-                self.board[y1][x1] = 0
+                self.board[y1][x1] = BoardStat.NOTHING
         self.ships.remove((x_cells, y_cells, len_ship))
         self.update_ship_area()
 
     def check_collision_ship(self, x, y):
         x_cells = (x - self.left) // CELL_SIZE
         y_cells = (y - self.top) // CELL_SIZE
-        return True if self.board[y_cells][x_cells] == 0 else False
+        return True if self.board[y_cells][x_cells] == BoardStat.NOTHING else False
 
     def update_ship_area(self):
         for i in self.ships:
@@ -127,7 +136,7 @@ class Field:
                         continue
                     elif self.board[y1][x1] == 1:
                         continue
-                    self.board[y1][x1] = 2
+                    self.board[y1][x1] = 4
 
 
 '''    def debug_board(self):
