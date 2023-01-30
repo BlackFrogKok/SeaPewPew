@@ -1,5 +1,6 @@
 import random
 
+
 class AutoShips:
 
     def __init__(self, offset):
@@ -12,7 +13,6 @@ class AutoShips:
         self.direction = None
 
     def __create_start_block(self, available_blocks):
-
         self.orientation = random.randint(0, 1)
         # -1 is left or down, 1 is right or up
         self.direction = random.choice((-1, 1))
@@ -48,7 +48,6 @@ class AutoShips:
             return self.direction, ship_coordinates[-1][self.orientation] + self.direction
 
     def __is_ship_valid(self, new_ship):
-
 
         ship = set(new_ship)
         return ship.issubset(self.available_blocks)

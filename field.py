@@ -1,17 +1,11 @@
 from enum import Enum
 import pygame
-from AutoShips import AutoShips
-import pprint
+from const import *
+from ship import Ship
 
 pygame.font.init()
-WIDTH = 10
-HEIGHT = 10
-CELL_SIZE = 50
-FIELD_COLOR = pygame.Color('white')
-font_size = int(CELL_SIZE / 1.5)
-font = pygame.font.SysFont('notosans', font_size)
-WHITE = (255, 255, 255)
-BLACK = (0, 0, 0)
+
+font = pygame.font.SysFont('notosans', FONT_SIZE)
 LETTERS = "ABCDEFGHIJ"
 explosionImg = pygame.image.load('data/sprites/Explosion2.png')
 
@@ -24,11 +18,9 @@ class BoardStat(Enum):
     SHIP_AREA = 4
 
 
-
-
 class Field:
     def __init__(self, top, left, offset, title):
-        self.board = [[BoardStat.NOTHING] * WIDTH for _ in range(HEIGHT)]
+        self.board = [[BoardStat.NOTHING] * WIDTH_BOARD for _ in range(HEIGHT_BOARD)]
         self.left = left
         self.top = top
         self.cell_size = CELL_SIZE
@@ -36,31 +28,22 @@ class Field:
         self.title = title
         self.ships = []
 
-    def auto_ships(self):
-        if self.offset > 0:
-            computer = AutoShips(self.offset)
-            self.ships = computer.ships
-            for ship in self.ships:
-                for coords in ship:
-                    self.board[coords[0]][coords[1]] = BoardStat.SHIP
-
     def render(self, screen):
+
         # отрисовка названий полей
         if self.offset > 0:
             player = font.render('Поле противника', True, WHITE)
-            sign_width = player.get_width()
             screen.blit(player, (self.left + 155, self.top - 30))
         else:
             player = font.render('Ваше поле', True, WHITE)
-            sign_width = player.get_width()
             screen.blit(player, (self.left + 190, self.top - 30))
 
         # отрисовка клеток
-        for y in range(HEIGHT):
-            for x in range(WIDTH):
-                pygame.draw.rect(screen, FIELD_COLOR, (
+        for y in range(HEIGHT_BOARD):
+            for x in range(WIDTH_BOARD):
+                pygame.draw.rect(screen, WHITE, (
                     x * self.cell_size + self.left, y * self.cell_size + self.top, self.cell_size, self.cell_size), 1)
-                if self.board[y][x] == BoardStat.SHIP:
+                if self.board[y][x] == BoardStat.MISS_SHOT:
                     pygame.draw.circle(screen, WHITE, (
                         x * self.cell_size + self.left + self.cell_size // 2,
                         y * self.cell_size + self.top + self.cell_size // 2),
@@ -91,68 +74,94 @@ class Field:
                                   CELL_SIZE * i + self.top + CELL_SIZE // 3))
             # Letters (horizontal)
             screen.blit(letters_hor, (CELL_SIZE * i + self.left + CELL_SIZE // 4,
-                                      self.top + CELL_SIZE * HEIGHT + CELL_SIZE // 4))
+                                      self.top + CELL_SIZE * HEIGHT_BOARD + CELL_SIZE // 4))
 
     def check_strike(self, x, y):
         x_cells = (x - self.left) // CELL_SIZE
         y_cells = (y - self.top) // CELL_SIZE
-        if self.board[y_cells][x_cells] == BoardStat.NOTHING:
+        if self.board[y_cells][x_cells] == BoardStat.NOTHING or \
+                self.board[y_cells][x_cells] == BoardStat.SHIP_AREA:
             self.board[y_cells][x_cells] = BoardStat.MISS_SHOT
-            print(self.board[y_cells][x_cells])
-        elif self.board[y_cells][x_cells] == BoardStat.SHIP:
+        elif self.board[y_cells][x_cells].__class__ == Ship:
+            ship = self.board[y_cells][x_cells]
             self.board[y_cells][x_cells] = BoardStat.HARM
+            if ship.damage():
+                for x1 in range(ship.x - 1, ship.x + ship.height + 1):
+                    for y1 in range(ship.y - 1, ship.y + ship.width + 1):
+                        if x1 < 0 or y1 < 0 or x1 > WIDTH_BOARD - 1 or y1 > HEIGHT_BOARD - 1:
+                            continue
+                        elif self.board[x1][y1] == BoardStat.HARM:
+                            continue
+                        self.board[x1][y1] = BoardStat.MISS_SHOT
+                self.ships.remove(ship)
 
     def check_click_corr(self, x, y):
-        if self.left <= x <= self.left + CELL_SIZE * WIDTH and self.top <= y <= self.top + CELL_SIZE * HEIGHT:
+        if self.left <= x <= self.left + CELL_SIZE * WIDTH_BOARD \
+                and self.top <= y <= self.top + CELL_SIZE * HEIGHT_BOARD:
             return True
         else:
             return False
 
+    def get_ships_count(self):
+        return len(self.ships)
     def get_field_width(self):
-        return self.cell_size * HEIGHT + self.left
+        return self.cell_size * HEIGHT_BOARD + self.left
 
     def get_field_height(self):
-        return self.cell_size * HEIGHT + self.top + 50
+        return self.cell_size * HEIGHT_BOARD + self.top + 50
 
-    def set_ship(self, x, y, len_ship):
-        x_cells = (x - self.left) // CELL_SIZE
-        y_cells = (y - self.top) // CELL_SIZE
-        self.ships.append((x_cells, y_cells, len_ship))
-        for i in range(y_cells, y_cells + len_ship):
-            self.board[i][x_cells] = BoardStat.SHIP
+    def set_ship(self, x, y, len_ship, orient, coord=True):
+        x_cells = (x - self.left) // CELL_SIZE if coord else x
+        y_cells = (y - self.top) // CELL_SIZE if coord else y
+        ship = Ship(x_cells, y_cells, len_ship, orient)
+        self.ships.append(ship)
+        for x1 in range(ship.x, ship.x + ship.height):
+            for y1 in range(ship.y, ship.y + ship.width):
+                self.board[x1][y1] = ship
         self.update_ship_area()
+        print(ship)
+        self.debug_board()
         return self.left + x_cells * CELL_SIZE, self.top + y_cells * CELL_SIZE
 
-    def del_ship(self, x, y, len_ship):
-        x_cells = (x - self.left) // CELL_SIZE
-        y_cells = (y - self.top) // CELL_SIZE
-        for y1 in range(y_cells - 1, y_cells + len_ship + 1):
-            for x1 in range(x_cells - 1, x_cells + 2):
-                if x1 < 0 or y1 < 0 or x1 > WIDTH - 1 or y1 > HEIGHT - 1:
+    def del_ship(self, x, y, coord=True):
+        x_cells = (x - self.left) // CELL_SIZE if coord else x
+        y_cells = (y - self.top) // CELL_SIZE if coord else y
+        ship = self.board[y_cells][x_cells]
+        for x1 in range(ship.x - 1, ship.x + ship.height + 1):
+            for y1 in range(ship.y - 1, ship.y + ship.width + 1):
+                if x1 < 0 or x1 >= WIDTH_BOARD or y1 < 0 or y1 >= HEIGHT_BOARD:
                     continue
-                self.board[y1][x1] = BoardStat.NOTHING
-        self.ships.remove((x_cells, y_cells, len_ship))
+                self.board[x1][y1] = BoardStat.NOTHING
+        self.ships.remove(ship)
         self.update_ship_area()
 
-    def check_collision_ship(self, x, y):
-        x_cells = (x - self.left) // CELL_SIZE
-        y_cells = (y - self.top) // CELL_SIZE
-        return True if self.board[y_cells][x_cells] == BoardStat.NOTHING else False
+    def check_collision_ship(self, x, y, len_ship, orient, coord=True):
+        x_cells = (x - self.left) // CELL_SIZE if coord else x
+        y_cells = (y - self.top) // CELL_SIZE if coord else y
+        ship = Ship(x_cells, y_cells, len_ship, orient)
+        if ship.x + ship.height - 1 >= HEIGHT_BOARD or ship.x < 0 or \
+                ship.y + ship.width - 1 >= HEIGHT_BOARD or ship.y < 0:
+            return False
+
+        for x1 in range(ship.x, ship.x + ship.height):
+            for y1 in range(ship.y, ship.y + ship.width):
+                if self.board[x1][y1] != BoardStat.NOTHING:
+                    return False
+        return True
 
     def update_ship_area(self):
-        for i in self.ships:
-            for y1 in range(i[1] - 1, i[1] + i[2] + 1):
-                for x1 in range(i[0] - 1, i[0] + 2):
-                    if x1 < 0 or y1 < 0 or x1 > WIDTH - 1 or y1 > HEIGHT - 1:
+        for ship in self.ships:
+            for x1 in range(ship.x - 1, ship.x + ship.height + 1):
+                for y1 in range(ship.y - 1, ship.y + ship.width + 1):
+                    if x1 < 0 or y1 < 0 or x1 > WIDTH_BOARD - 1 or y1 > HEIGHT_BOARD - 1:
                         continue
-                    elif self.board[y1][x1] == 1:
+                    elif self.board[x1][y1].__class__ == Ship:
                         continue
-                    self.board[y1][x1] = 4
+                    self.board[x1][y1] = BoardStat.SHIP_AREA
 
-
-'''    def debug_board(self):
+    def debug_board(self):
         for i in self.board:
             for i2 in i:
-                print(i2, end=' ')
+                print(i2.value, end=' ')
             print()
-        print()'''
+        print()

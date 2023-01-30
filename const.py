@@ -1,0 +1,15 @@
+from enum import Enum
+
+CELL_SIZE = 50
+WHITE = (255, 255, 255)
+BLACK = (0, 0, 0)
+FONT_SIZE = int(CELL_SIZE / 1.5)
+INTERVAL_BOARD = 150
+INTERVAL = 50
+MARGIN_LEFT = 100
+WIDTH_BOARD = 10
+HEIGHT_BOARD = 10
+
+class shipOrientation(Enum):
+    NORMAL = 0
+    ROTATE = 1

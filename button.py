@@ -1,17 +1,20 @@
 import pygame
 
+pygame.init()
 font = pygame.font.SysFont('Corbel', 35)
 
 
-class Button():
-    def __init__(self, x, y, width, height, buttonText='Button', onclickFunction=None, onePress=False):
+class Button:
+    def __init__(self, x, y, width, height, buttonText='', onclickFunction=None, onePress=False,
+                 color_text=(20, 20, 20), icon=None):
         self.x = x
         self.y = y
+        self.icon = icon
         self.width = width
         self.height = height
         self.onclickFunction = onclickFunction
         self.onePress = onePress
-
+        self.color_text = color_text
         self.fillColors = {
             'normal': '#20B2AA',
             'hover': '#666666',
@@ -21,7 +24,7 @@ class Button():
         self.buttonSurface = pygame.Surface((self.width, self.height))
         self.buttonRect = pygame.Rect(self.x, self.y, self.width, self.height)
 
-        self.buttonSurf = font.render(buttonText, True, (20, 20, 20))
+        self.buttonSurf = font.render(buttonText, True, color_text)
 
         self.alreadyPressed = False
 
@@ -29,7 +32,10 @@ class Button():
 
         mouse_pos = pygame.mouse.get_pos()
 
-        self.buttonSurface.fill(self.fillColors['normal'])
+        if self.icon is None:
+            self.buttonSurface.fill(self.fillColors['normal'])
+        else:
+            self.buttonSurface.blit(self.icon, (0, 0))
         if self.buttonRect.collidepoint(mouse_pos):
             self.buttonSurface.fill(self.fillColors['hover'])
 
