@@ -1,5 +1,7 @@
 from enum import Enum
 import pygame
+from AutoShips import AutoShips
+import pprint
 
 pygame.font.init()
 WIDTH = 10
@@ -22,6 +24,8 @@ class BoardStat(Enum):
     SHIP_AREA = 4
 
 
+
+
 class Field:
     def __init__(self, top, left, offset, title):
         self.board = [[BoardStat.NOTHING] * WIDTH for _ in range(HEIGHT)]
@@ -32,8 +36,15 @@ class Field:
         self.title = title
         self.ships = []
 
-    def render(self, screen):
+    def auto_ships(self):
+        if self.offset > 0:
+            computer = AutoShips(self.offset)
+            self.ships = computer.ships
+            for ship in self.ships:
+                for coords in ship:
+                    self.board[coords[0]][coords[1]] = BoardStat.SHIP
 
+    def render(self, screen):
         # отрисовка названий полей
         if self.offset > 0:
             player = font.render('Поле противника', True, WHITE)
@@ -49,7 +60,7 @@ class Field:
             for x in range(WIDTH):
                 pygame.draw.rect(screen, FIELD_COLOR, (
                     x * self.cell_size + self.left, y * self.cell_size + self.top, self.cell_size, self.cell_size), 1)
-                if self.board[y][x] == BoardStat.MISS_SHOT:
+                if self.board[y][x] == BoardStat.SHIP:
                     pygame.draw.circle(screen, WHITE, (
                         x * self.cell_size + self.left + self.cell_size // 2,
                         y * self.cell_size + self.top + self.cell_size // 2),

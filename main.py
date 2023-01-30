@@ -4,6 +4,7 @@ import sys
 from field import Field
 from shipChoice import ShipChoice
 from button import Button
+from AutoShips import AutoShips
 
 pygame.font.init()
 CELL_SIZE = 50
@@ -11,6 +12,7 @@ WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
 font_size = int(CELL_SIZE / 1.5)
 INTERVAL = 150
+CREATORS = False
 
 
 def start_screen():
@@ -18,36 +20,50 @@ def start_screen():
     fps = 60
     fps_clock = pygame.time.Clock()
     sc = pygame.display.set_mode((width, height))
+    global screen
     screen = pygame.display.set_mode(res)
     dog_surf = pygame.image.load('data/sprites/mor.gif')
     dog_rect = dog_surf.get_rect(
         bottomright=(width, height))
     sc.blit(dog_surf, dog_rect)
 
-    dog_surf_nad = pygame.image.load('data/sprites/mrboi2.png')
-    dog_rect_nad = dog_surf_nad.get_rect(
-        bottomright=(120, 100))
-    sc.blit(dog_surf_nad, dog_rect)
+    if not CREATORS:
+        dog_surf_nad = pygame.image.load('data/sprites/mrboi2.png')
+        dog_rect_nad = dog_surf_nad.get_rect(
+            bottomright=(120, 100))
+        sc.blit(dog_surf_nad, dog_rect)
+
 
     pygame.mixer.music.load("data/music/noize.mp3")
     pygame.mixer.music.set_volume(0.1)
     pygame.mixer.music.play(-1)
     buttons = [Button(175, 150, 300, 100, 'Играть!', onclickFunction=new_game),
-               Button(175, 270, 300, 100, 'Об авторах')]
+               Button(175, 270, 300, 100, 'Об авторах', onclickFunction=creators),]
 
     while True:
         for ev in pygame.event.get():
             if ev.type == pygame.QUIT:
                 pygame.mixer.music.stop()
                 pygame.quit()
-
-        for object in buttons:
-            object.process(screen)
-
+        if not CREATORS:
+            for object in buttons:
+                object.process(screen)
+        if CREATORS:
+            table_creators_surf = pygame.image.load('data/sprites/table2.png')
+            table_creators_rect = table_creators_surf.get_rect(
+                bottomright=(500, 500))
+            sc.blit(table_creators_surf, (120, 0))
         pygame.display.flip()
         fps_clock.tick(fps)
         pygame.display.update()
 
+
+
+
+
+def creators():
+    global CREATORS
+    CREATORS = True
 
 def main():
     pygame.init()
@@ -65,6 +81,7 @@ def new_game():
     font = pygame.font.SysFont('notosans', font_size)
     board1 = Field(50, 100, 0, 'Ваше поле')
     board2 = Field(50, board1.get_field_width() + INTERVAL, 11.3, 'Поле противника')
+    board2.auto_ships()
     ship_choice_bar = ShipChoice(all_sprites, board1.get_field_height())
     while True:
         for event in pygame.event.get():
