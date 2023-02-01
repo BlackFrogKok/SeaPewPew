@@ -64,6 +64,39 @@ def main():
     start_screen()
 
 
+
+def end_screen(vic_or_def):
+    res = width, height = (640, 512)
+    fps = 60
+    fps_clock = pygame.time.Clock()
+    sc = pygame.display.set_mode((width, height))
+    global screen
+    screen = pygame.display.set_mode(res)
+    dog_surf = pygame.image.load('data/sprites/background.png')
+    dog_rect = dog_surf.get_rect(
+        bottomright=(width, height))
+    sc.blit(dog_surf, dog_rect)
+    if vic_or_def:
+        dog_surf_nad = pygame.image.load('data/sprites/Victory.png')
+        dog_rect_nad = dog_surf_nad.get_rect(
+            bottomright=(600, 250))
+        sc.blit(dog_surf_nad, (20, 50))
+    else:
+        dog_surf_nad = pygame.image.load('data/sprites/Defeat.png')
+        dog_rect_nad = dog_surf_nad.get_rect(
+            bottomright=(600, 250))
+        sc.blit(dog_surf_nad, (20, 50))
+
+    while True:
+        for ev in pygame.event.get():
+            if ev.type == pygame.QUIT:
+                pygame.mixer.music.stop()
+                pygame.quit()
+        pygame.display.flip()
+        fps_clock.tick(fps)
+        pygame.display.update()
+
+
 def change_stat(val):
     global ships_setup
     ships_setup = val
@@ -90,6 +123,7 @@ def show_go_screen(screen):
         screen.blit(lastScore, (screen.get_width() / 2 - lastScore.get_width() / 2, 150))
         screen.blit(currentScore, (screen.get_width() / 2 - currentScore.get_width() / 2, 240))
         pygame.display.update()
+        end_screen(True)
     score = 0
 
 
