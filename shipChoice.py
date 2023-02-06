@@ -5,8 +5,6 @@ from const import *
 
 import pygame
 
-from ship import Ship
-
 
 def load_image(name, colorkey=None):
     fullname = os.path.join('data/sprites/', name)
@@ -19,7 +17,7 @@ def load_image(name, colorkey=None):
 
 
 class ShipChoice:
-    def __init__(self, all_sprites, top, func):
+    def __init__(self, left, top, all_sprites, func):
         self.current_ship = None
         self.button = None
         self.err = False
@@ -30,8 +28,8 @@ class ShipChoice:
                          load_image("OneDeckShip2.png"): [4, 1]}
         self.font = pygame.font.SysFont('Comic Sans MS', 30)
         self.motionFlag = False
-        self.start_coords = [MARGIN_LEFT, top]
-        self.end_coords = [MARGIN_LEFT, top]
+        self.start_coords = [left, top]
+        self.end_coords = [left, top]
         self.shipView = pygame.sprite.Group()
         self.moved_item = pygame.sprite.Group()
         for img in self.listShip.keys():
@@ -98,6 +96,7 @@ class ShipChoice:
             self.update_position()
         else:
             self.moved_item.remove(self.current_ship)
+            self.current_ship.image = self.current_ship.idd
             if self.listShip[self.current_ship.idd][0] <= 0:
                 self.shipView.add(self.current_ship)
             else:
@@ -117,12 +116,12 @@ class ShipChoice:
 
     def rotate_ship(self):
         self.current_ship.image = pygame.transform.rotate(self.current_ship.image, 90)
-        self.current_ship.orient = shipOrientation.ROTATE\
+        self.current_ship.orient = shipOrientation.ROTATE \
             if self.current_ship.orient == shipOrientation.NORMAL else shipOrientation.NORMAL
 
     def check_readiness(self, func):
         if len(self.moved_item.sprites()) == 10:
-            func(False)
+            func()
             self.button = None
         else:
             self.err = True

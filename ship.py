@@ -17,6 +17,7 @@ class Ship:
         if self.ship_health == 0:
             return 1
 
+
 '''    def change_orient(self):
         self.height = 1 if self.orient == shipOrientation.NORMAL else self.len_ship
         self.width = self.len_ship if self.orient == shipOrientation.NORMAL else 1'''
